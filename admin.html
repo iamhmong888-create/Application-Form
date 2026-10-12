@@ -153,7 +153,17 @@ const $ = s => document.querySelector(s);
 $("#logoTop").src = NFE.LOGO_SRC; $("#logoGate").src = NFE.LOGO_SRC;
 const admins = (window.ADMIN_EMAILS || []).map(e => e.toLowerCase());
 
-firebase.initializeApp(FIREBASE_CONFIG);
+const cfg = window.FIREBASE_CONFIG || {};
+const notConfigured = !cfg.apiKey || String(cfg.apiKey).startsWith("ใส่") || !cfg.authDomain || String(cfg.authDomain).startsWith("ใส่");
+if (location.protocol === "file:") {
+  $("#gateMsg").textContent = "เปิดไฟล์จากเครื่องโดยตรงจะล็อกอินไม่ได้ กรุณาเปิดผ่านลิงก์ github.io";
+}
+if (notConfigured) {
+  $("#gateMsg").textContent = "ยังไม่ได้ใส่ค่า Firebase ในไฟล์ firebase-config.js (ขั้นที่ 5 ในวิธีติดตั้ง)";
+  $("#login").disabled = true;
+  throw new Error("Firebase not configured");
+}
+firebase.initializeApp(cfg);
 const auth = firebase.auth(), db = firebase.firestore();
 const col = db.collection("applications");
 
@@ -173,11 +183,15 @@ $("#login").addEventListener("click", async () => {
   try { await auth.signInWithPopup(provider); }
   catch(e){
     if (["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/cancelled-popup-request"].includes(e.code)) {
-      try { await auth.signInWithRedirect(provider); } catch(e2){ $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + e2.code; }
+      try { await auth.signInWithRedirect(provider); } catch(e2){ $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + (e2.code || e2.message || e2); }
     } else if (e.code === "auth/unauthorized-domain") {
       $("#gateMsg").textContent = "โดเมนนี้ยังไม่ได้เพิ่มใน Firebase (Authentication → Settings → Authorized domains)";
     } else if (e.code !== "auth/popup-closed-by-user") {
-      $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + e.code;
+      $("#gateMsg").textContent = e.code === "auth/operation-not-allowed"
+        ? "ยังไม่ได้เปิดการล็อกอินด้วย Google ใน Firebase (Authentication → Sign-in method → Google → Enable)"
+        : e.code === "auth/invalid-api-key" || e.code === "auth/api-key-not-valid.-please-pass-a-valid-api-key."
+        ? "ค่า apiKey ใน firebase-config.js ไม่ถูกต้อง กรุณาคัดลอกใหม่จาก Firebase"
+        : "เข้าสู่ระบบไม่สำเร็จ: " + (e.code || e.message || e);
     }
   }
 });
