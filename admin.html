@@ -42,6 +42,31 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font
 .gate h2{margin:0;font-size:1.2rem}
 .gate p{margin:0;color:var(--muted)}
 .msg{font-size:.9rem;color:var(--danger)}
+.msg.ok{color:var(--ok)}
+.lf{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left}
+.lf label{font-size:.86rem;color:var(--muted);font-weight:500;display:flex;flex-direction:column;gap:4px}
+.lf input,.af input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px 11px;width:100%;min-width:0}
+.lf input:focus,.af input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.pw{position:relative;display:flex}
+.pw input{padding-right:64px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:.8rem;background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 6px}
+.linkbtn{font:inherit;font-size:.86rem;background:none;border:0;color:var(--accent);cursor:pointer;text-decoration:underline;padding:2px}
+.note{font-size:.84rem;color:var(--muted);background:var(--soft);border-radius:8px;padding:10px 12px;text-align:left;width:100%}
+.gate.wide{max-width:620px}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{color:var(--muted);font-weight:500;font-size:.8rem}
+.tbl tr:nth-child(even) td{background:var(--zebra)}
+.tblwrap{width:100%;overflow-x:auto}
+.mgr{margin-bottom:18px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.mgr h2{margin:0;font-size:1.1rem}
+.mgr .hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mgr .hd h2{flex:1}
+.af{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;align-items:end}
+.af label{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.you{font-size:.75rem;color:var(--accent);font-weight:600;margin-left:6px}
+.filebtn{position:relative;overflow:hidden;display:inline-block}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
 
 .grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
@@ -88,15 +113,58 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
       <h1>ใบสมัครนักศึกษา · ผู้ดูแลระบบ</h1>
       <p>สกร.ระดับอำเภอเทิง จังหวัดเชียงราย</p>
     </div>
-    <div class="who" id="who" hidden><span id="whoEmail"></span><button class="btn small" id="logout" type="button">ออกจากระบบ</button></div>
+    <div class="who" id="who" hidden><span id="whoEmail"></span><button class="btn small" id="mgrBtn" type="button" aria-expanded="false">จัดการผู้ดูแล</button><button class="btn small" id="pwBtn" type="button" aria-expanded="false">เปลี่ยนรหัสผ่าน</button><button class="btn small" id="logout" type="button">ออกจากระบบ</button></div>
   </header>
 
   <section class="gate" id="gate">
     <img id="logoGate" alt="โลโก้ สกร.">
     <h2>เข้าสู่ระบบผู้ดูแล</h2>
-    <p>ใช้บัญชี Google ของเจ้าหน้าที่ที่ได้รับสิทธิ์</p>
-    <button class="btn primary" id="login" type="button">เข้าสู่ระบบด้วย Google</button>
-    <div class="msg" id="gateMsg"></div>
+    <form class="lf" id="loginForm" novalidate>
+      <label>ชื่อ (ไม่ต้องใส่คำนำหน้าและนามสกุล)<input id="lgName" type="text" autocomplete="username" placeholder="เช่น สุทธิสิทธิ์"></label>
+      <label>รหัสผ่าน (เบอร์โทร หรือรหัสที่ตั้งเอง)<span class="pw"><input id="lgPhone" type="password" autocomplete="current-password" placeholder="เบอร์โทร 10 หลัก"><button type="button" id="pwToggle">แสดง</button></span></label>
+      <button class="btn primary" id="login" type="submit">เข้าสู่ระบบ</button>
+    </form>
+    <div class="msg" id="gateMsg" role="alert"></div>
+    <button class="linkbtn" id="toSetup" type="button" hidden>ตั้งค่าระบบครั้งแรก</button>
+  </section>
+
+  <section class="gate wide" id="setup" hidden>
+    <h2>ตั้งค่าระบบครั้งแรก</h2>
+    <p>นำเข้ารายชื่อผู้ดูแลจากไฟล์ Excel ที่มีคอลัมน์ คำนำหน้า, ชื่อ, สกุล, เบอร์โทร</p>
+    <div class="note">ทำได้ครั้งเดียวตอนเริ่มใช้ระบบ เลือก “ผู้ดูแลคนแรก” ในตาราง ระบบจะเข้าสู่ระบบด้วยคนนี้ หลังจากนี้ผู้ดูแลเพิ่มหรือลบคนอื่นได้จากเมนู “จัดการผู้ดูแล”</div>
+    <label class="btn filebtn">เลือกไฟล์ Excel<input type="file" id="setupFile" accept=".xlsx,.xls,.csv"></label>
+    <div class="tblwrap" id="setupPreview"></div>
+    <button class="btn primary" id="setupGo" type="button" hidden>สร้างบัญชีผู้ดูแล</button>
+    <div class="msg" id="setupMsg" role="alert"></div>
+    <button class="linkbtn" id="backLogin" type="button">กลับไปหน้าเข้าสู่ระบบ</button>
+  </section>
+
+  <section class="panel mgr" id="pwPanel" hidden>
+    <div class="hd"><h2>เปลี่ยนรหัสผ่าน</h2><button class="btn small" id="pwClose" type="button">ปิด</button></div>
+    <form class="af" id="pwForm" novalidate>
+      <label>รหัสผ่านปัจจุบัน<input id="pwOld" type="password" autocomplete="current-password"></label>
+      <label>รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)<input id="pwNew" type="password" autocomplete="new-password"></label>
+      <label>ยืนยันรหัสผ่านใหม่<input id="pwNew2" type="password" autocomplete="new-password"></label>
+      <button class="btn primary" type="submit" id="pwSave">บันทึกรหัสผ่านใหม่</button>
+    </form>
+    <div class="status" id="pwMsg" role="status"></div>
+    <div class="note">ครั้งต่อไปให้เข้าระบบด้วยชื่อเดิมและรหัสผ่านใหม่ ถ้าลืมรหัสผ่าน ให้ผู้ดูแลคนอื่นลบสิทธิ์ แล้วเพิ่มใหม่โดยใช้ชื่อที่ต่างไปเล็กน้อย เช่น เติมตัวเลขท้ายชื่อ</div>
+  </section>
+
+  <section class="panel mgr" id="mgr" hidden>
+    <div class="hd"><h2>ผู้ดูแลระบบ</h2>
+      <label class="btn small filebtn">นำเข้าจาก Excel<input type="file" id="importFile" accept=".xlsx,.xls,.csv"></label>
+      <button class="btn small" id="mgrClose" type="button">ปิด</button></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>ชื่อ-สกุล</th><th>ชื่อเข้าระบบ</th><th>รหัสผ่าน</th><th>เพิ่มโดย</th><th></th></tr></thead><tbody id="adminRows"></tbody></table></div>
+    <form class="af" id="addForm" novalidate>
+      <label>คำนำหน้า<input id="aPrefix" type="text" placeholder="นาย / นาง / นางสาว"></label>
+      <label>ชื่อ *<input id="aFirst" type="text"></label>
+      <label>สกุล<input id="aLast" type="text"></label>
+      <label>เบอร์โทร (รหัสผ่าน) *<input id="aPhone" type="text" inputmode="numeric" maxlength="12"></label>
+      <button class="btn primary" type="submit" id="addBtn">เพิ่มผู้ดูแล</button>
+    </form>
+    <div class="status" id="mgrMsg" role="status"></div>
+    <div class="note">ส่งต่องานให้คนใหม่: เพิ่มชื่อคนใหม่ก่อน ให้เขาลองเข้าระบบ แล้วให้คนใหม่เป็นผู้ลบชื่อคนเดิมออก (ลบชื่อตัวเองไม่ได้ เพื่อให้ระบบมีผู้ดูแลเหลืออย่างน้อย 1 คนเสมอ)</div>
   </section>
 
   <main class="grid" id="app" hidden>
@@ -151,7 +219,6 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
 <script>
 const $ = s => document.querySelector(s);
 $("#logoTop").src = NFE.LOGO_SRC; $("#logoGate").src = NFE.LOGO_SRC;
-const admins = (window.ADMIN_EMAILS || []).map(e => e.toLowerCase());
 
 const cfg = window.FIREBASE_CONFIG || {};
 const notConfigured = !cfg.apiKey || String(cfg.apiKey).startsWith("ใส่") || !cfg.authDomain || String(cfg.authDomain).startsWith("ใส่");
@@ -160,7 +227,7 @@ if (location.protocol === "file:") {
 }
 if (notConfigured) {
   $("#gateMsg").textContent = "ยังไม่ได้ใส่ค่า Firebase ในไฟล์ firebase-config.js (ขั้นที่ 5 ในวิธีติดตั้ง)";
-  $("#login").disabled = true;
+  document.querySelectorAll("#loginForm input, #login").forEach(el => el.disabled = true);
   throw new Error("Firebase not configured");
 }
 firebase.initializeApp(cfg);
@@ -175,35 +242,275 @@ new ResizeObserver(() => {
   sheet.style.transform = `scale(${k})`; $("#scaler").style.height = (1123*k) + "px";
 }).observe($("#scaler"));
 
-/* ---------- auth ---------- */
-$("#login").addEventListener("click", async () => {
-  $("#gateMsg").textContent = "";
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({prompt: "select_account"});
-  try { await auth.signInWithPopup(provider); }
-  catch(e){
-    if (["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/cancelled-popup-request"].includes(e.code)) {
-      try { await auth.signInWithRedirect(provider); } catch(e2){ $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + (e2.code || e2.message || e2); }
-    } else if (e.code === "auth/unauthorized-domain") {
-      $("#gateMsg").textContent = "โดเมนนี้ยังไม่ได้เพิ่มใน Firebase (Authentication → Settings → Authorized domains)";
-    } else if (e.code !== "auth/popup-closed-by-user") {
-      $("#gateMsg").textContent = e.code === "auth/operation-not-allowed"
-        ? "ยังไม่ได้เปิดการล็อกอินด้วย Google ใน Firebase (Authentication → Sign-in method → Google → Enable)"
-        : e.code === "auth/invalid-api-key" || e.code === "auth/api-key-not-valid.-please-pass-a-valid-api-key."
-        ? "ค่า apiKey ใน firebase-config.js ไม่ถูกต้อง กรุณาคัดลอกใหม่จาก Firebase"
-        : "เข้าสู่ระบบไม่สำเร็จ: " + (e.code || e.message || e);
-    }
-  }
+/* ---------- บัญชีผู้ดูแล: ชื่อ + เบอร์โทร ---------- */
+const EMAIL_DOMAIN = "nfe-theng.app";
+const normName = v => String(v || "").normalize("NFC").replace(/\s+/g, "").trim();
+const normPhone = v => { let d = String(v ?? "").replace(/\D/g, ""); if (d.length === 9 && d[0] !== "0") d = "0" + d; return d; };
+async function emailFor(name){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("nfe:" + normName(name)));
+  const hex = [...new Uint8Array(buf)].slice(0, 12).map(b => b.toString(16).padStart(2, "0")).join("");
+  return `a${hex}@${EMAIL_DOMAIN}`;
+}
+const fmtPhone = p => p.length === 10 ? `${p.slice(0,3)}-${p.slice(3,6)}-${p.slice(6)}` : p;
+const maskPhone = p => p.length >= 4 ? "xxx-xxx-" + p.slice(-4) : "";
+const admins = db.collection("admins");
+const setupRef = db.doc("meta/setup");
+let me = null, unsubAdmins = null;
+
+/* login */
+$("#pwToggle").addEventListener("click", () => {
+  const i = $("#lgPhone"), show = i.type === "password";
+  i.type = show ? "text" : "password"; $("#pwToggle").textContent = show ? "ซ่อน" : "แสดง";
+});
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = normName($("#lgName").value), raw = $("#lgPhone").value.trim(), phone = /^[\d\s-]+$/.test(raw) ? normPhone(raw) : raw;
+  const msg = $("#gateMsg"); msg.className = "msg"; msg.textContent = "";
+  if (!name || phone.length < 6){ msg.textContent = "กรุณากรอกชื่อและรหัสผ่านให้ครบ"; return; }
+  $("#login").disabled = true; $("#login").textContent = "กำลังเข้าสู่ระบบ…";
+  try {
+    await auth.signInWithEmailAndPassword(await emailFor(name), phone);
+  } catch(err){
+    const c = err && err.code;
+    msg.textContent =
+      ["auth/invalid-credential","auth/wrong-password","auth/user-not-found","auth/invalid-login-credentials","auth/invalid-email"].includes(c) ? "ชื่อหรือรหัสผ่านไม่ถูกต้อง" :
+      c === "auth/too-many-requests" ? "ลองผิดหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่" :
+      c === "auth/operation-not-allowed" ? "ยังไม่ได้เปิดการเข้าสู่ระบบแบบ Email/Password ใน Firebase (Authentication → Sign-in method)" :
+      c === "auth/network-request-failed" ? "เชื่อมต่ออินเทอร์เน็ตไม่ได้" :
+      "เข้าสู่ระบบไม่สำเร็จ: " + (c || err.message || err);
+  } finally { $("#login").disabled = false; $("#login").textContent = "เข้าสู่ระบบ"; }
 });
 $("#logout").addEventListener("click", () => auth.signOut());
 
-auth.onAuthStateChanged(user => {
+/* แสดงลิงก์ตั้งค่าครั้งแรก เฉพาะตอนที่ระบบยังไม่มีผู้ดูแล */
+setupRef.get().then(d => { $("#toSetup").hidden = d.exists; }).catch(() => {});
+$("#toSetup").addEventListener("click", () => { $("#gate").hidden = true; $("#setup").hidden = false; });
+$("#backLogin").addEventListener("click", () => { $("#setup").hidden = true; $("#gate").hidden = false; });
+
+auth.onAuthStateChanged(async user => {
   if (unsub){ unsub(); unsub = null; }
-  const ok = user && admins.includes((user.email||"").toLowerCase());
-  $("#gate").hidden = !!ok; $("#app").hidden = !ok; $("#who").hidden = !user;
-  $("#whoEmail").textContent = user ? user.email : "";
-  if (user && !ok) $("#gateMsg").textContent = `บัญชี ${user.email} ไม่มีสิทธิ์ดูใบสมัคร กรุณาออกจากระบบแล้วใช้บัญชีเจ้าหน้าที่`;
-  if (ok) listen();
+  if (unsubAdmins){ unsubAdmins(); unsubAdmins = null; }
+  me = null;
+  if (!user){ showApp(false); return; }
+  let doc = null;
+  try { doc = await admins.doc(user.uid).get(); } catch(e){}
+  if (!doc || !doc.exists){
+    if (window._settingUp) return;      /* กำลังสร้างบัญชีแรก */
+    await auth.signOut();
+    $("#gateMsg").className = "msg"; $("#gateMsg").textContent = "บัญชีนี้ถูกยกเลิกสิทธิ์ผู้ดูแลแล้ว";
+    return;
+  }
+  me = {uid: user.uid, ...doc.data()};
+  showApp(true);
+});
+function showApp(on){
+  $("#gate").hidden = on; $("#setup").hidden = true; $("#app").hidden = !on; $("#who").hidden = !on;
+  if (!on) openPanel(null);
+  $("#whoEmail").textContent = me ? (me.fullName || me.name) : "";
+  if (on){ $("#lgPhone").value = ""; listen(); listenAdmins(); }
+}
+
+/* อ่านไฟล์ Excel รายชื่อ */
+async function readPeople(file){
+  const wb = XLSX.read(await file.arrayBuffer());
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header: 1, raw: false, defval: ""});
+  const hi = rows.findIndex(r => r.some(c => String(c).trim() === "ชื่อ") && r.some(c => /เบอร์|โทร/.test(String(c))));
+  if (hi < 0) throw new Error("ไม่พบหัวคอลัมน์ “ชื่อ” และ “เบอร์โทร” ในไฟล์");
+  const h = rows[hi].map(c => String(c).trim());
+  const ix = {prefix: h.findIndex(c => c.includes("คำนำหน้า")), first: h.indexOf("ชื่อ"), last: h.findIndex(c => c === "สกุล" || c === "นามสกุล"), phone: h.findIndex(c => /เบอร์|โทร/.test(c))};
+  const out = [];
+  rows.slice(hi + 1).forEach(r => {
+    const first = String(r[ix.first] || "").trim(), phone = normPhone(r[ix.phone]);
+    if (!first) return;
+    out.push({prefix: ix.prefix >= 0 ? String(r[ix.prefix]||"").trim() : "", first, last: ix.last >= 0 ? String(r[ix.last]||"").trim() : "", phone, ok: phone.length === 10});
+  });
+  if (!out.length) throw new Error("ไม่พบรายชื่อในไฟล์");
+  return out;
+}
+const PRIMARY_DEFAULT = "วนศาสตร์";
+function previewTable(people, pick){
+  const def = people.findIndex(p => p.ok && normName(p.first) === normName(PRIMARY_DEFAULT));
+  const sel = def >= 0 ? def : people.findIndex(p => p.ok);
+  return `<table class="tbl"><thead><tr>${pick ? "<th>ผู้ดูแลคนแรก</th>" : ""}<th>ชื่อ-สกุล</th><th>ชื่อเข้าระบบ</th><th>รหัสผ่าน</th><th></th></tr></thead><tbody>` +
+    people.map((p, i) => `<tr>${pick ? `<td><input type="radio" name="primary" value="${i}" aria-label="เลือก ${esc(p.first)} เป็นผู้ดูแลคนแรก" ${i === sel ? "checked" : ""} ${p.ok ? "" : "disabled"}></td>` : ""}<td>${esc([p.prefix + p.first, p.last].join(" "))}</td><td>${esc(p.first)}</td><td>${p.ok ? esc(maskPhone(p.phone)) : "—"}</td><td>${p.ok ? "" : '<span style="color:var(--danger)">เบอร์ไม่ครบ 10 หลัก</span>'}</td></tr>`).join("") +
+    `</tbody></table>`;
+}
+const esc = v => String(v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function adminDoc(p, addedBy){
+  return {name: p.first, fullName: [p.prefix + p.first, p.last].filter(Boolean).join(" "), phoneTail: p.phone.slice(-4),
+          addedBy: addedBy || "", addedAt: firebase.firestore.FieldValue.serverTimestamp()};
+}
+
+/* สร้างบัญชีให้คนอื่น โดยใช้แอปสำรอง เพื่อไม่ให้หลุดจากบัญชีของตัวเอง */
+let helperAuth = null;
+function helper(){
+  if (!helperAuth){ const app = firebase.initializeApp(cfg, "helper-" + Date.now()); helperAuth = app.auth(); }
+  return helperAuth;
+}
+async function createAccount(p){
+  const h = helper(), email = await emailFor(p.first);
+  try {
+    const cred = await h.createUserWithEmailAndPassword(email, p.phone);
+    return cred.user.uid;
+  } catch(e){
+    if (e.code === "auth/email-already-in-use"){
+      try { const cred = await h.signInWithEmailAndPassword(email, p.phone); return cred.user.uid; }
+      catch(e2){ throw new Error(`ชื่อ “${p.first}” เคยมีบัญชีด้วยเบอร์อื่น ให้ใช้เบอร์เดิม หรือใช้ชื่อเล่นอื่นแทน`); }
+    }
+    throw e;
+  } finally { try { await h.signOut(); } catch(e){} }
+}
+
+/* ตั้งค่าครั้งแรก */
+let setupPeople = [];
+$("#setupFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; $("#setupMsg").textContent = ""; $("#setupGo").hidden = true;
+  if (!f) return;
+  try {
+    setupPeople = await readPeople(f);
+    $("#setupPreview").innerHTML = previewTable(setupPeople, true);
+    $("#setupGo").hidden = !setupPeople.some(p => p.ok);
+  } catch(err){ $("#setupPreview").textContent = ""; $("#setupMsg").textContent = err.message; }
+});
+$("#setupGo").addEventListener("click", async () => {
+  const pi = +(document.querySelector('input[name="primary"]:checked') || {value: -1}).value;
+  const primary = setupPeople[pi];
+  const people = (primary && primary.ok ? [primary] : []).concat(setupPeople.filter(p => p.ok && p !== primary)), msg = $("#setupMsg"); msg.className = "msg";
+  const names = people.map(p => normName(p.first));
+  if (new Set(names).size !== names.length){ msg.textContent = "มีชื่อซ้ำกันในไฟล์ กรุณาแก้ให้ไม่ซ้ำก่อน"; return; }
+  $("#setupGo").disabled = true; msg.className = "msg ok"; msg.textContent = "กำลังสร้างบัญชี…";
+  const first = people[0];
+  window._settingUp = true;
+  try {
+    let cred;
+    try { cred = await auth.createUserWithEmailAndPassword(await emailFor(first.first), first.phone); }
+    catch(e){ if (e.code === "auth/email-already-in-use") cred = await auth.signInWithEmailAndPassword(await emailFor(first.first), first.phone); else throw e; }
+    const uid = cred.user.uid;
+    const batch = db.batch();
+    batch.set(admins.doc(uid), adminDoc(first, "ตั้งค่าครั้งแรก"));
+    batch.set(setupRef, {by: uid, at: firebase.firestore.FieldValue.serverTimestamp()});
+    await batch.commit();
+    const who = [first.prefix + first.first, first.last].filter(Boolean).join(" ");
+    const fails = [];
+    for (const p of people.slice(1)){
+      try { const u = await createAccount(p); await admins.doc(u).set(adminDoc(p, who)); }
+      catch(e){ fails.push(`${p.first}: ${e.message || e.code}`); }
+    }
+    window._settingUp = false;
+    const doc = await admins.doc(uid).get();
+    me = {uid, ...doc.data()}; showApp(true);
+    if (fails.length) mgrStatus("เพิ่มบางคนไม่สำเร็จ · " + fails.join(" · "), "bad");
+  } catch(e){
+    window._settingUp = false;
+    msg.className = "msg";
+    msg.textContent = e.code === "permission-denied" ? "ระบบตั้งค่าไปแล้ว กรุณาเข้าสู่ระบบด้วยชื่อและเบอร์โทร" :
+      e.code === "auth/operation-not-allowed" ? "ยังไม่ได้เปิดการเข้าสู่ระบบแบบ Email/Password ใน Firebase" :
+      "ตั้งค่าไม่สำเร็จ: " + (e.code || e.message);
+    try { await auth.signOut(); } catch(_){}
+  } finally { $("#setupGo").disabled = false; }
+});
+
+/* จัดการผู้ดูแล */
+const mgrStatus = (m, c="") => { $("#mgrMsg").textContent = m; $("#mgrMsg").className = "status " + c; };
+function openPanel(which){
+  [["mgr","mgrBtn"],["pwPanel","pwBtn"]].forEach(([p,b]) => {
+    const on = p === which && $("#"+p).hidden;
+    $("#"+p).hidden = !on; $("#"+b).setAttribute("aria-expanded", String(on));
+  });
+}
+$("#mgrBtn").addEventListener("click", () => openPanel("mgr"));
+$("#pwBtn").addEventListener("click", () => { openPanel("pwPanel"); $("#pwMsg").textContent = ""; if (!$("#pwPanel").hidden) $("#pwOld").focus(); });
+$("#mgrClose").addEventListener("click", () => openPanel(null));
+$("#pwClose").addEventListener("click", () => openPanel(null));
+
+/* เปลี่ยนรหัสผ่าน */
+const pwStatus = (m, c="") => { $("#pwMsg").textContent = m; $("#pwMsg").className = "status " + c; };
+$("#pwForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const oldPw = $("#pwOld").value.replace(/\s/g, ""), nw = $("#pwNew").value, nw2 = $("#pwNew2").value;
+  const old = /^[\d-]+$/.test(oldPw) ? normPhone(oldPw) : oldPw;
+  if (!old || !nw){ pwStatus("กรุณากรอกให้ครบทุกช่อง", "bad"); return; }
+  if (nw.length < 6){ pwStatus("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัว", "bad"); return; }
+  if (nw !== nw2){ pwStatus("รหัสผ่านใหม่ทั้ง 2 ช่องไม่ตรงกัน", "bad"); return; }
+  const user = auth.currentUser; if (!user || !me) return;
+  $("#pwSave").disabled = true; pwStatus("กำลังบันทึก…");
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(await emailFor(me.name), old);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(nw);
+    try { await admins.doc(me.uid).update({customPw: true}); } catch(_){}
+    $("#pwForm").reset();
+    pwStatus("เปลี่ยนรหัสผ่านแล้ว ครั้งต่อไปให้ใช้รหัสผ่านใหม่", "ok");
+  } catch(err){
+    const c = err && err.code;
+    pwStatus(["auth/invalid-credential","auth/wrong-password","auth/invalid-login-credentials"].includes(c) ? "รหัสผ่านปัจจุบันไม่ถูกต้อง" :
+      c === "auth/weak-password" ? "รหัสผ่านใหม่ง่ายเกินไป กรุณาตั้งให้ยาวขึ้น" :
+      c === "auth/too-many-requests" ? "ลองผิดหลายครั้งเกินไป กรุณารอสักครู่" :
+      "เปลี่ยนรหัสผ่านไม่สำเร็จ: " + (c || err.message), "bad");
+  } finally { $("#pwSave").disabled = false; }
+});
+let adminList = [];
+function listenAdmins(){
+  unsubAdmins = admins.orderBy("addedAt").onSnapshot(snap => {
+    adminList = snap.docs.map(d => ({uid: d.id, ...d.data()}));
+    renderAdmins();
+  }, () => {});
+}
+function renderAdmins(){
+  const tb = $("#adminRows"); tb.textContent = "";
+  adminList.forEach(a => {
+    const tr = document.createElement("tr");
+    const isMe = me && a.uid === me.uid;
+    const cells = [a.fullName || a.name, a.name, a.customPw ? "ตั้งรหัสเองแล้ว" : (a.phoneTail ? "เบอร์โทร xxx-xxx-" + a.phoneTail : ""), a.addedBy || ""];
+    cells.forEach((t, k) => { const td = document.createElement("td"); td.textContent = t; if (k === 0 && isMe){ const y = document.createElement("span"); y.className = "you"; y.textContent = "(คุณ)"; td.appendChild(y); } tr.appendChild(td); });
+    const td = document.createElement("td"); td.style.textAlign = "right"; td.style.whiteSpace = "nowrap";
+    if (!isMe){
+      const b = document.createElement("button"); b.type = "button"; b.className = "btn small danger"; b.textContent = "ลบสิทธิ์";
+      b.onclick = () => {
+        td.textContent = "";
+        const yes = document.createElement("button"); yes.type = "button"; yes.className = "btn small danger"; yes.textContent = "ยืนยันลบ";
+        const no = document.createElement("button"); no.type = "button"; no.className = "btn small"; no.textContent = "ยกเลิก"; no.style.marginLeft = "6px";
+        yes.onclick = async () => {
+          try { await admins.doc(a.uid).delete(); mgrStatus(`ลบสิทธิ์ ${a.fullName || a.name} แล้ว`, "ok"); }
+          catch(e){ mgrStatus("ลบไม่สำเร็จ: " + e.code, "bad"); renderAdmins(); }
+        };
+        no.onclick = renderAdmins;
+        td.append(yes, no);
+      };
+      td.appendChild(b);
+    }
+    tr.appendChild(td); tb.appendChild(tr);
+  });
+}
+async function addPeople(people){
+  const exist = new Set(adminList.map(a => normName(a.name)));
+  const by = me ? (me.fullName || me.name) : "";
+  let ok = 0; const fails = [];
+  for (const p of people){
+    if (!p.ok){ fails.push(`${p.first}: เบอร์ไม่ครบ 10 หลัก`); continue; }
+    if (exist.has(normName(p.first))){ fails.push(`${p.first}: มีชื่อนี้อยู่แล้ว`); continue; }
+    try { const uid = await createAccount(p); await admins.doc(uid).set(adminDoc(p, by)); exist.add(normName(p.first)); ok++; }
+    catch(e){ fails.push(`${p.first}: ${e.message || e.code}`); }
+  }
+  mgrStatus(`เพิ่มผู้ดูแลแล้ว ${ok} คน` + (fails.length ? ` · ไม่สำเร็จ: ${fails.join(" · ")}` : ""), fails.length ? "bad" : "ok");
+  return ok;
+}
+$("#addForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const p = {prefix: $("#aPrefix").value.trim(), first: $("#aFirst").value.trim(), last: $("#aLast").value.trim(), phone: normPhone($("#aPhone").value)};
+  p.ok = p.phone.length === 10;
+  if (!p.first){ mgrStatus("กรุณากรอกชื่อ", "bad"); return; }
+  if (!p.ok){ mgrStatus("เบอร์โทรต้องมี 10 หลัก", "bad"); return; }
+  $("#addBtn").disabled = true; mgrStatus("กำลังเพิ่ม…");
+  const n = await addPeople([p]);
+  $("#addBtn").disabled = false;
+  if (n) $("#addForm").reset();
+});
+$("#importFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try { mgrStatus("กำลังนำเข้า…"); await addPeople(await readPeople(f)); }
+  catch(err){ mgrStatus(err.message, "bad"); }
 });
 
 /* ---------- data ---------- */
