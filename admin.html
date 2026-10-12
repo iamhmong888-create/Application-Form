@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>ผู้ดูแลใบสมัคร สกร.เทิง</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;600;700&display=swap">
+<style>
+/* Layout: application ledger on the left, the selected application's A4 sheet + actions on the right */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --ink:#1b2236; --muted:#5d6579; --line:#d9dce5;
+  --accent:#1f3a6e; --accent-ink:#ffffff; --gold:#b48a2c; --soft:#eef1f8; --sel:#e3e9f6; --zebra:#f6f7fa;
+  --danger:#b3261e; --ok:#1d7a46; --new:#9a5b00;
+  --f-ui:"IBM Plex Sans Thai",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151d; --surface:#1b2030; --ink:#e7e9f0; --muted:#9aa1b4; --line:#2f3548; --sel:#26314b; --zebra:#20263a;
+  --accent:#8fb0ec; --accent-ink:#0f1626; --gold:#d8b25c; --soft:#222a3d; --danger:#f2867d; --ok:#6fd39b; --new:#f0b860; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151d; --surface:#1b2030; --ink:#e7e9f0; --muted:#9aa1b4; --line:#2f3548; --sel:#26314b; --zebra:#20263a;
+  --accent:#8fb0ec; --accent-ink:#0f1626; --gold:#d8b25c; --soft:#222a3d; --danger:#f2867d; --ok:#6fd39b; --new:#f0b860; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 16px 48px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.top img{width:46px;height:46px}
+.top h1{margin:0;font-size:1.25rem;line-height:1.3}
+.top p{margin:0;color:var(--muted);font-size:.88rem}
+.top .who{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:.88rem;color:var(--muted);flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;border-radius:8px;padding:9px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.btn.small{padding:6px 11px;font-size:.86rem;font-weight:500}
+.btn:disabled{opacity:.55;cursor:progress}
+.btn:focus-visible,input:focus-visible,.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.gate{max-width:440px;margin:60px auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:28px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.gate img{width:96px;height:96px}
+.gate h2{margin:0;font-size:1.2rem}
+.gate p{margin:0;color:var(--muted)}
+.msg{font-size:.9rem;color:var(--danger)}
+
+.grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-width:0}
+.list-head{padding:14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.counts{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:inherit;font-size:.86rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab b{font-variant-numeric:tabular-nums;margin-left:4px}
+input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink)}
+.list{max-height:calc(100vh - 260px);overflow:auto}
+@media (max-width:960px){.list{max-height:none}}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:11px 14px;border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:3px solid transparent;width:100%;text-align:left;font:inherit;color:inherit}
+.item:nth-child(even){background:var(--zebra)}
+.item:hover{background:var(--soft)}
+.item[aria-current="true"]{background:var(--sel);border-left-color:var(--accent)}
+.item .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .meta{grid-column:1/-1;color:var(--muted);font-size:.84rem;display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.pill{font-size:.75rem;font-weight:600;border-radius:999px;padding:2px 9px;white-space:nowrap;align-self:start}
+.pill.new{background:color-mix(in srgb,var(--new) 16%,transparent);color:var(--new)}
+.pill.checked{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.empty{padding:28px 16px;color:var(--muted);text-align:center;font-size:.92rem}
+.list-foot{padding:10px 14px;display:flex;justify-content:flex-end}
+
+.detail{padding:16px;display:flex;flex-direction:column;gap:14px}
+.dhead{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.dhead h2{margin:0;font-size:1.15rem}
+.dhead .sub{color:var(--muted);font-size:.86rem;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.88rem;background:color-mix(in srgb,var(--danger) 8%,var(--surface));padding:8px 12px;border-radius:8px}
+.status{font-size:.88rem;min-height:1.3em}
+.status.ok{color:var(--ok)} .status.bad{color:var(--danger)}
+.paper{background:var(--soft);border-radius:10px;padding:12px}
+.scaler{position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.15);background:#fff;max-width:794px;margin:0 auto}
+.scaler > .sheet{transform-origin:0 0;position:absolute;left:0;top:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img id="logoTop" alt="">
+    <div>
+      <h1>ใบสมัครนักศึกษา · ผู้ดูแลระบบ</h1>
+      <p>สกร.ระดับอำเภอเทิง จังหวัดเชียงราย</p>
+    </div>
+    <div class="who" id="who" hidden><span id="whoEmail"></span><button class="btn small" id="logout" type="button">ออกจากระบบ</button></div>
+  </header>
+
+  <section class="gate" id="gate">
+    <img id="logoGate" alt="โลโก้ สกร.">
+    <h2>เข้าสู่ระบบผู้ดูแล</h2>
+    <p>ใช้บัญชี Google ของเจ้าหน้าที่ที่ได้รับสิทธิ์</p>
+    <button class="btn primary" id="login" type="button">เข้าสู่ระบบด้วย Google</button>
+    <div class="msg" id="gateMsg"></div>
+  </section>
+
+  <main class="grid" id="app" hidden>
+    <section class="panel">
+      <div class="list-head">
+        <div class="counts" role="group" aria-label="กรองตามสถานะ">
+          <button class="tab" type="button" data-f="all" aria-pressed="true">ทั้งหมด<b id="cAll">0</b></button>
+          <button class="tab" type="button" data-f="new" aria-pressed="false">ใหม่<b id="cNew">0</b></button>
+          <button class="tab" type="button" data-f="checked" aria-pressed="false">ตรวจแล้ว<b id="cChecked">0</b></button>
+        </div>
+        <input type="search" id="q" placeholder="ค้นหาชื่อ เลขบัตร เบอร์โทร หรือเลขที่ใบสมัคร">
+      </div>
+      <div class="list" id="list"><div class="empty">กำลังโหลดรายการ…</div></div>
+      <div class="list-foot"><button class="btn small" id="csv" type="button">ดาวน์โหลดรายชื่อ (Excel)</button></div>
+    </section>
+
+    <section class="panel detail" id="detail">
+      <div class="empty" id="pick">เลือกใบสมัครจากรายการเพื่อดูแบบฟอร์ม พิมพ์ หรือบันทึกเป็น PDF</div>
+      <div id="dwrap" hidden>
+        <div class="dhead">
+          <div style="flex:1;min-width:0">
+            <h2 id="dName"></h2>
+            <div class="sub" id="dSub"></div>
+          </div>
+          <span class="pill" id="dPill"></span>
+        </div>
+        <div class="acts" style="margin-top:12px">
+          <button class="btn primary" id="print" type="button">พิมพ์</button>
+          <button class="btn" id="save" type="button">บันทึก PDF ลงเครื่อง</button>
+          <button class="btn" id="toggle" type="button"></button>
+          <button class="btn danger" id="del" type="button">ลบ</button>
+        </div>
+        <div class="confirm" id="delAsk" hidden style="margin-top:10px">ลบใบสมัครนี้ถาวรใช่ไหม กู้คืนไม่ได้
+          <button class="btn small danger" id="delYes" type="button">ลบถาวร</button>
+          <button class="btn small" id="delNo" type="button">ยกเลิก</button>
+        </div>
+        <div class="status" id="status" role="status" style="margin-top:8px"></div>
+        <div class="paper"><div class="scaler" id="scaler"></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="sheet.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+$("#logoTop").src = NFE.LOGO_SRC; $("#logoGate").src = NFE.LOGO_SRC;
+const admins = (window.ADMIN_EMAILS || []).map(e => e.toLowerCase());
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth(), db = firebase.firestore();
+const col = db.collection("applications");
+
+let rows = [], filter = "all", current = null, unsub = null;
+const sheet = NFE.mount($("#scaler"));
+sheet.classList.add("print-area");
+new ResizeObserver(() => {
+  const w = $("#scaler").clientWidth, k = w / 794;
+  sheet.style.transform = `scale(${k})`; $("#scaler").style.height = (1123*k) + "px";
+}).observe($("#scaler"));
+
+/* ---------- auth ---------- */
+$("#login").addEventListener("click", async () => {
+  $("#gateMsg").textContent = "";
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt: "select_account"});
+  try { await auth.signInWithPopup(provider); }
+  catch(e){
+    if (["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/cancelled-popup-request"].includes(e.code)) {
+      try { await auth.signInWithRedirect(provider); } catch(e2){ $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + e2.code; }
+    } else if (e.code === "auth/unauthorized-domain") {
+      $("#gateMsg").textContent = "โดเมนนี้ยังไม่ได้เพิ่มใน Firebase (Authentication → Settings → Authorized domains)";
+    } else if (e.code !== "auth/popup-closed-by-user") {
+      $("#gateMsg").textContent = "เข้าสู่ระบบไม่สำเร็จ: " + e.code;
+    }
+  }
+});
+$("#logout").addEventListener("click", () => auth.signOut());
+
+auth.onAuthStateChanged(user => {
+  if (unsub){ unsub(); unsub = null; }
+  const ok = user && admins.includes((user.email||"").toLowerCase());
+  $("#gate").hidden = !!ok; $("#app").hidden = !ok; $("#who").hidden = !user;
+  $("#whoEmail").textContent = user ? user.email : "";
+  if (user && !ok) $("#gateMsg").textContent = `บัญชี ${user.email} ไม่มีสิทธิ์ดูใบสมัคร กรุณาออกจากระบบแล้วใช้บัญชีเจ้าหน้าที่`;
+  if (ok) listen();
+});
+
+/* ---------- data ---------- */
+function listen(){
+  unsub = col.orderBy("submittedAt", "desc").onSnapshot(snap => {
+    rows = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    renderList();
+    if (current){
+      const fresh = rows.find(r => r.id === current.id);
+      if (fresh) show(fresh, false); else closeDetail();
+    }
+  }, err => {
+    $("#list").innerHTML = `<div class="empty">โหลดรายการไม่ได้: ${err.code === "permission-denied" ? "บัญชีนี้ไม่มีสิทธิ์อ่านข้อมูล (ตรวจ Rules ใน Firestore)" : err.code}</div>`;
+  });
+}
+const refNo = id => id.slice(0, 8).toUpperCase();
+function whenOf(r){
+  const t = r.submittedAt && r.submittedAt.toDate ? r.submittedAt.toDate() : (r.appliedAt ? new Date(r.appliedAt) : null);
+  return t;
+}
+function fmtDate(t){
+  if (!t) return "กำลังบันทึก…";
+  return `${t.getDate()} ${NFE.MONTHS[t.getMonth()].slice(0,3)}. ${String(t.getFullYear()+543).slice(2)} · ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}`;
+}
+function visible(){
+  const q = $("#q").value.trim().toLowerCase().replace(/-/g,"");
+  return rows.filter(r => {
+    const st = r.status === "checked" ? "checked" : "new";
+    if (filter !== "all" && st !== filter) return false;
+    if (!q) return true;
+    const d = r.data || {};
+    const hay = [d.fname, d.lname, d.cid, d.phone, refNo(r.id), d.level].join(" ").toLowerCase().replace(/-/g,"");
+    return hay.includes(q);
+  });
+}
+function renderList(){
+  const nNew = rows.filter(r => r.status !== "checked").length;
+  $("#cAll").textContent = rows.length; $("#cNew").textContent = nNew; $("#cChecked").textContent = rows.length - nNew;
+  const list = $("#list"), v = visible();
+  list.textContent = "";
+  if (!rows.length){ list.innerHTML = `<div class="empty">ยังไม่มีใบสมัครเข้ามา เมื่อนักศึกษากด “ส่งใบสมัคร” รายการจะขึ้นที่นี่ทันที</div>`; return; }
+  if (!v.length){ list.innerHTML = `<div class="empty">ไม่พบใบสมัครที่ตรงกับการค้นหา</div>`; return; }
+  v.forEach(r => {
+    const d = r.data || {}, checked = r.status === "checked";
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "item"; b.setAttribute("aria-current", current && current.id === r.id ? "true" : "false");
+    const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = `${d.fname||""} ${d.lname||""}`.trim() || "(ไม่มีชื่อ)";
+    const pill = document.createElement("span"); pill.className = "pill " + (checked ? "checked" : "new"); pill.textContent = checked ? "ตรวจแล้ว" : "ใหม่";
+    const meta = document.createElement("span"); meta.className = "meta";
+    [refNo(r.id), d.level || "-", d.phone || "-", fmtDate(whenOf(r))].forEach(t => { const x = document.createElement("span"); x.textContent = t; meta.appendChild(x); });
+    b.append(nm, pill, meta);
+    b.addEventListener("click", () => { show(r, true); });
+    list.appendChild(b);
+  });
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  filter = t.dataset.f;
+  document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-pressed", x === t ? "true" : "false"));
+  renderList();
+}));
+$("#q").addEventListener("input", renderList);
+
+/* ---------- detail ---------- */
+const status = (m, c="") => { $("#status").textContent = m; $("#status").className = "status " + c; };
+function show(r, scroll){
+  const changed = !current || current.id !== r.id;
+  current = r;
+  const d = r.data || {}, checked = r.status === "checked";
+  $("#pick").hidden = true; $("#dwrap").hidden = false;
+  $("#dName").textContent = `${d.fname||""} ${d.lname||""}`.trim();
+  $("#dSub").textContent = `เลขที่ ${refNo(r.id)} · ส่งเมื่อ ${fmtDate(whenOf(r))} · ${d.level || ""}`;
+  $("#dPill").className = "pill " + (checked ? "checked" : "new"); $("#dPill").textContent = checked ? "ตรวจแล้ว" : "ใหม่";
+  $("#toggle").textContent = checked ? "ย้อนเป็น “ใหม่”" : "ทำเครื่องหมายว่าตรวจแล้ว";
+  NFE.fill(sheet, d, {photo: r.photo, sig: r.sig, date: r.appliedAt || whenOf(r) || new Date()});
+  if (changed){ status(""); $("#delAsk").hidden = true; }
+  renderList();
+  if (scroll && matchMedia("(max-width:960px)").matches) $("#detail").scrollIntoView({behavior:"smooth"});
+}
+function closeDetail(){ current = null; $("#dwrap").hidden = true; $("#pick").hidden = false; renderList(); }
+
+$("#print").addEventListener("click", async () => {
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  window.print();
+});
+$("#save").addEventListener("click", async () => {
+  if (!current) return;
+  const btn = $("#save"); btn.disabled = true; status("กำลังสร้างไฟล์ PDF…");
+  try {
+    const pdf = await NFE.toPdf(sheet);
+    pdf.save(refNo(current.id) + "_" + NFE.fileName(current.data || {}));
+    status("บันทึกไฟล์ PDF แล้ว", "ok");
+  } catch(e){ console.error(e); status("สร้างไฟล์ไม่สำเร็จ กรุณาลองใหม่", "bad"); }
+  finally { btn.disabled = false; }
+});
+$("#toggle").addEventListener("click", async () => {
+  if (!current) return;
+  const next = current.status === "checked" ? "new" : "checked";
+  try { await col.doc(current.id).update({status: next}); status(next === "checked" ? "ทำเครื่องหมายว่าตรวจแล้ว" : "ย้อนสถานะเป็นใหม่แล้ว", "ok"); }
+  catch(e){ status("เปลี่ยนสถานะไม่สำเร็จ: " + e.code, "bad"); }
+});
+$("#del").addEventListener("click", () => { $("#delAsk").hidden = false; });
+$("#delNo").addEventListener("click", () => { $("#delAsk").hidden = true; });
+$("#delYes").addEventListener("click", async () => {
+  if (!current) return;
+  try { await col.doc(current.id).delete(); $("#delAsk").hidden = true; closeDetail(); }
+  catch(e){ status("ลบไม่สำเร็จ: " + e.code, "bad"); }
+});
+
+/* ---------- Excel ---------- */
+$("#csv").addEventListener("click", () => {
+  const head = ["ลำดับ","เลขที่","วันที่ส่ง","สถานะ","ระดับ","ชื่อ","นามสกุล","เลขบัตรประชาชน/รหัส G","วันเดือนปีเกิด","อายุ (ปี)","ศาสนา","สัญชาติ","อาชีพ","โทรศัพท์","บ้านเลขที่","หมู่","ซอย","ถนน","ตำบล","อำเภอ","จังหวัด","รหัสไปรษณีย์","ชื่อ-สกุลบิดา","ชื่อ-สกุลมารดา","จบชั้น","ปีที่จบ","จากสถานศึกษา","วุฒิทางธรรม","ศกร./ศรช./ศศช.","รหัสกลุ่ม"];
+  const rowsOut = visible().map((r, i) => {
+    const d = r.data || {}, t = whenOf(r);
+    const age = NFE.ageOf(d, new Date(r.appliedAt || t || Date.now()));
+    return [i+1, refNo(r.id),
+      t ? `${t.getDate()} ${NFE.MONTHS[t.getMonth()]} ${t.getFullYear()+543} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}` : "",
+      r.status === "checked" ? "ตรวจแล้ว" : "ใหม่", d.level, d.fname, d.lname, NFE.fmtCid(d.cid),
+      d.dob_d ? `${d.dob_d} ${d.dob_m ? NFE.MONTHS[d.dob_m-1] : ""} ${d.dob_y||""}` : "", age ? age.years : "",
+      d.religion, d.nation, d.job, d.phone, d.h_no, d.h_moo, d.h_soi, d.h_road, d.h_tambon, d.h_amphoe, d.h_prov, d.h_zip,
+      d.father, d.mother, d.prev_grade, d.prev_year, d.prev_school, d.dharma, d.center, d.group
+    ].map(v => v ?? "");
+  });
+  const ws = XLSX.utils.aoa_to_sheet([head, ...rowsOut]);
+  ws["!cols"] = head.map((h, c) => ({ wch: Math.min(40, Math.max(h.length + 2, ...rowsOut.map(r => String(r[c]).length + 2))) }));
+  ws["!autofilter"] = { ref: XLSX.utils.encode_range({ s: {r:0, c:0}, e: {r: rowsOut.length, c: head.length - 1} }) };
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "ผู้สมัคร");
+  const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  const now = new Date();
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `รายชื่อผู้สมัคร_สกร.เทิง_${now.getDate()}-${now.getMonth()+1}-${now.getFullYear()+543}.xlsx`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+});
+</script>
+</body>
+</html>

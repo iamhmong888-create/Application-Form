@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ["iamhmong888@gmail.com"];
+    }
+
+    match /applications/{id} {
+      // นักศึกษา: ส่งใบสมัครได้อย่างเดียว อ่าน แก้ หรือลบไม่ได้
+      allow create: if request.resource.data.keys().hasOnly(["data","photo","sig","appliedAt","submittedAt","status"])
+        && request.resource.data.data is map
+        && request.resource.data.data.fname is string
+        && request.resource.data.data.fname.size() > 0
+        && request.resource.data.data.size() < 80
+        && request.resource.data.photo is string && request.resource.data.photo.size() < 300000
+        && request.resource.data.sig is string && request.resource.data.sig.size() < 300000
+        && request.resource.data.status == "new"
+        && request.resource.data.submittedAt == request.time;
+
+      // admin: ดู เปลี่ยนสถานะ และลบได้
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status"]);
+    }
+  }
+}

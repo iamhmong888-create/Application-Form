@@ -1,0 +1,45 @@
+ระบบรับสมัครนักศึกษา สกร.ระดับอำเภอเทิง — วิธีติดตั้ง
+
+ไฟล์ในชุดนี้
+- index.html          หน้าสมัครของนักศึกษา (อัปโหลดขึ้น GitHub)
+- admin.html          หน้าผู้ดูแล (อัปโหลดขึ้น GitHub)
+- sheet.js            แบบฟอร์ม A4 และโลโก้ ใช้ร่วมกันทั้ง 2 หน้า (อัปโหลดขึ้น GitHub)
+- firebase-config.js  ค่าตั้งค่า Firebase ต้องแก้ก่อนอัปโหลด (อัปโหลดขึ้น GitHub)
+- firestore.rules     กฎความปลอดภัย ใช้วางใน Firebase (ไม่ต้องอัปโหลดขึ้น GitHub)
+
+ขั้นที่ 1  สร้างโปรเจกต์ Firebase
+  เข้า https://console.firebase.google.com ด้วย iamhmong888@gmail.com
+  กด "สร้างโปรเจกต์" ตั้งชื่อ เช่น nfe-theng (ปิด Google Analytics ได้)
+
+ขั้นที่ 2  สร้างฐานข้อมูล
+  Build > Firestore Database > Create database
+  Location: asia-southeast1 (Singapore)  /  เลือก Production mode
+
+ขั้นที่ 3  ใส่กฎความปลอดภัย
+  Firestore > แท็บ Rules > ลบข้อความเดิม > วางเนื้อหาไฟล์ firestore.rules > กด Publish
+
+ขั้นที่ 4  เปิดการล็อกอินด้วย Google
+  Build > Authentication > Get started > Sign-in method > Google > Enable > เลือกอีเมล support > Save
+  แท็บ Settings > Authorized domains > Add domain > ใส่  iamhmong888-create.github.io
+
+ขั้นที่ 5  คัดลอกค่าตั้งค่า
+  ไอคอนเฟือง > Project settings > เลื่อนลงกดไอคอน </> (Web) > ตั้งชื่อแอป > Register
+  คัดลอกค่า apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId
+  เปิด firebase-config.js ด้วย Notepad แล้ววางแทนข้อความ "ใส่ค่า..." ทั้ง 6 บรรทัด แล้วบันทึก
+
+ขั้นที่ 6  อัปโหลดขึ้น GitHub
+  เปิด repository > Add file > Upload files
+  ลากไฟล์ index.html, admin.html, sheet.js, firebase-config.js > Commit changes
+  รอ 1-2 นาที
+
+ลิงก์ที่ได้
+  หน้าสมัคร (ใส่ในเว็บโรงเรียน):  https://iamhmong888-create.github.io/ชื่อrepo/
+  หน้า admin (ไม่ต้องเผยแพร่):     https://iamhmong888-create.github.io/ชื่อrepo/admin.html
+
+ทดสอบหลังติดตั้ง
+  1. เปิดหน้าสมัคร กรอกข้อมูลทดสอบ แล้วกด "ส่งใบสมัคร" ต้องได้เลขที่ใบสมัคร
+  2. เปิดหน้า admin กด "เข้าสู่ระบบด้วย Google" ใบสมัครทดสอบต้องขึ้นในรายการ
+  3. ลบใบสมัครทดสอบทิ้งก่อนเปิดรับสมัครจริง
+
+เพิ่มเจ้าหน้าที่คนอื่นให้เข้าหน้า admin ได้
+  ต้องเพิ่มอีเมลใน 2 ที่:  ADMIN_EMAILS ใน firebase-config.js  และรายการอีเมลใน firestore.rules (แล้วกด Publish ใหม่)
