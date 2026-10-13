@@ -82,6 +82,22 @@ input:focus,select:focus,button:focus-visible,.chk input:focus-visible{outline:2
 .send ol{margin:6px 0 0;padding-left:20px;color:var(--muted)}
 .copyline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
 .copyline code{background:var(--soft);padding:4px 8px;border-radius:6px;user-select:all;word-break:break-all}
+.att{display:flex;flex-direction:column;gap:10px;margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.att h3{margin:0;font-size:.98rem}
+.attgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px}
+.attbox{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.attbox .t{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600;font-size:.92rem}
+.attbox .t small{font-weight:400;color:var(--muted);font-size:.78rem}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.th{position:relative;width:76px;height:76px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th button{position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font:600 14px/1 sans-serif;cursor:pointer;display:grid;place-items:center}
+.th.busy{display:grid;place-items:center;color:var(--muted);font-size:.72rem}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:.86rem;background:var(--soft);border-radius:8px;padding:10px 12px}
+.consent input{width:18px;height:18px;margin-top:3px;flex:none;accent-color:var(--accent)}
+.consent.bad{outline:2px solid var(--danger)}
+.prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .done{display:flex;flex-direction:column;gap:6px;background:color-mix(in srgb,var(--ok) 12%,var(--surface));border:1px solid var(--ok);border-radius:8px;padding:12px 14px;font-size:.92rem}
 .done strong{color:var(--ok)}
 .done code{font-size:1.05rem;font-weight:700;letter-spacing:.06em}
@@ -230,6 +246,13 @@ input:focus,select:focus,button:focus-visible,.chk input:focus-visible{outline:2
         <div class="row" style="margin-top:10px">
           <div class="fld"><label for="d_other">อื่น ๆ ระบุ</label><input type="text" id="d_other" data-k="d_other"></div>
         </div>
+        <div class="att">
+          <h3>แนบรูปเอกสาร (ไม่บังคับ)</h3>
+          <p class="hint" style="margin:0">ถ่ายรูปเอกสารด้วยมือถือให้เห็นตัวหนังสือชัด แนบไว้ให้เจ้าหน้าที่ตรวจล่วงหน้าได้ ยังต้องนำเอกสารตัวจริงไปยื่นในวันสมัครเหมือนเดิม</p>
+          <div class="attgrid" id="attGrid"></div>
+          <label class="consent" id="consentBox" hidden><input type="checkbox" id="consent">
+            <span>ข้าพเจ้ายินยอมให้ สกร.ระดับอำเภอเทิง เก็บรูปเอกสารที่แนบไว้ เพื่อใช้ตรวจสอบการขึ้นทะเบียนเป็นนักศึกษาเท่านั้น และให้ลบเมื่อตรวจสอบเสร็จแล้ว</span></label>
+        </div>
       </fieldset>
 
       <fieldset>
@@ -247,6 +270,7 @@ input:focus,select:focus,button:focus-visible,.chk input:focus-visible{outline:2
         <button type="button" class="btn primary" id="send">ส่งใบสมัคร</button>
         <button type="button" class="btn" id="dl">ดาวน์โหลด PDF อย่างเดียว</button>
         <div class="status" id="status" role="status"></div>
+        <div class="prog" id="prog" hidden><i></i></div>
         <div class="done" id="done" hidden>
           <strong>ส่งใบสมัครเรียบร้อยแล้ว</strong>
           <span>เลขที่ใบสมัคร <code id="refNo"></code> กรุณาจดหรือแคปหน้าจอเก็บไว้</span>
@@ -376,6 +400,94 @@ new ResizeObserver(() => {
   sheet.style.transform = `scale(${k})`; scaler.style.height = (1123*k) + "px";
 }).observe(scaler);
 
+/* ---------- เอกสารแนบ ---------- */
+const ATT_TYPES = [
+  {key: "cert",   label: "วุฒิการศึกษาเดิม",          hint: "ใบ รบ. หรือใบประกาศนียบัตร", max: 3, tick: "d_cert"},
+  {key: "idcard", label: "สำเนาบัตรประชาชน",        hint: "ด้านหน้า (และด้านหลังถ้ามี)", max: 2, tick: "d_idcard"},
+  {key: "house",  label: "สำเนาทะเบียนบ้าน",         hint: "หน้าที่มีชื่อผู้สมัคร",        max: 2, tick: "d_house"},
+  {key: "other",  label: "เอกสารอื่น ๆ",              hint: "เช่น ใบเปลี่ยนชื่อ เอกสารบิดามารดา", max: 4, tick: null}
+];
+const MAX_TOTAL = 10, MAX_CHARS = 640000;
+const att = {}; ATT_TYPES.forEach(t => att[t.key] = []);
+const attCount = () => ATT_TYPES.reduce((n, t) => n + att[t.key].length, 0);
+
+function drawAttGrid(){
+  const g = $("#attGrid"); g.textContent = "";
+  ATT_TYPES.forEach(t => {
+    const box = document.createElement("div"); box.className = "attbox";
+    const head = document.createElement("div"); head.className = "t";
+    const nm = document.createElement("span"); nm.textContent = t.label;
+    const ct = document.createElement("small"); ct.textContent = `${att[t.key].length}/${t.max} รูป`;
+    head.append(nm, ct);
+    const hint = document.createElement("small"); hint.style.color = "var(--muted)"; hint.textContent = t.hint;
+    const th = document.createElement("div"); th.className = "thumbs";
+    att[t.key].forEach((f, i) => {
+      const d = document.createElement("div"); d.className = "th" + (f.busy ? " busy" : "");
+      if (f.busy) d.textContent = "กำลังย่อรูป…";
+      else {
+        const img = document.createElement("img"); img.src = f.data; img.alt = `${t.label} รูปที่ ${i+1}`;
+        const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", `ลบ${t.label} รูปที่ ${i+1}`);
+        x.onclick = () => { att[t.key].splice(i, 1); afterAttChange(t); };
+        d.append(img, x);
+      }
+      th.appendChild(d);
+    });
+    box.append(head, hint, th);
+    if (att[t.key].length < t.max){
+      const lb = document.createElement("label"); lb.className = "btn small file-btn"; lb.style.alignSelf = "flex-start";
+      lb.textContent = att[t.key].length ? "เพิ่มรูป" : "ถ่ายรูป / เลือกรูป";
+      const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true;
+      inp.onchange = () => addFiles(t, [...inp.files]);
+      lb.appendChild(inp); box.appendChild(lb);
+    }
+    g.appendChild(box);
+  });
+  $("#consentBox").hidden = attCount() === 0;
+}
+function afterAttChange(t){
+  if (t.tick && att[t.key].some(f => !f.busy)){ const c = $("#" + t.tick); if (c && !c.checked){ c.checked = true; } }
+  drawAttGrid(); render();
+}
+function loadImage(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); res(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("อ่านรูปไม่ได้")); };
+    img.src = url;
+  });
+}
+async function compress(file){
+  const img = await loadImage(file);
+  for (const [edge, q] of [[1600,.72],[1400,.65],[1200,.6],[1000,.55],[850,.5]]){
+    const k = Math.min(1, edge / Math.max(img.width, img.height));
+    const c = document.createElement("canvas"); c.width = Math.round(img.width*k); c.height = Math.round(img.height*k);
+    const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    const data = c.toDataURL("image/jpeg", q);
+    if (data.length <= MAX_CHARS) return {data, w: c.width, h: c.height};
+  }
+  throw new Error("รูปใหญ่เกินไป");
+}
+async function addFiles(t, files){
+  files = files.filter(f => /^image\//.test(f.type));
+  if (!files.length){ status("แนบได้เฉพาะไฟล์รูปภาพ ถ้าเป็น PDF ให้แคปหน้าจอเป็นรูปก่อน", "bad"); return; }
+  const room = Math.min(t.max - att[t.key].length, MAX_TOTAL - attCount());
+  if (room <= 0){ status(`แนบรูปได้สูงสุด ${MAX_TOTAL} รูปต่อใบสมัคร`, "bad"); return; }
+  if (files.length > room) status(`แนบเพิ่มได้อีก ${room} รูป ระบบเลือก ${room} รูปแรกให้`, "bad");
+  for (const f of files.slice(0, room)){
+    const slot = {busy: true}; att[t.key].push(slot); drawAttGrid();
+    try { Object.assign(slot, await compress(f), {busy: false}); }
+    catch(e){ att[t.key].splice(att[t.key].indexOf(slot), 1); status("ย่อรูปไม่สำเร็จ ลองถ่ายใหม่อีกครั้ง", "bad"); }
+  }
+  afterAttChange(t);
+}
+$("#consent").addEventListener("change", () => $("#consentBox").classList.remove("bad"));
+drawAttGrid();
+function attList(){
+  const out = [];
+  ATT_TYPES.forEach(t => att[t.key].forEach((f, i) => { if (!f.busy) out.push({type: t.key, label: `${t.label}${att[t.key].length > 1 ? " " + (i+1) : ""}`, data: f.data, w: f.w, h: f.h}); }));
+  return out;
+}
+
 /* validation */
 function validate(){
   const s = read(), bad = [];
@@ -384,6 +496,7 @@ function validate(){
   const yb = parseInt(s.dob_y,10); if (s.dob_y && !(yb > 2400 && yb <= new Date().getFullYear()+543)) bad.push($("#dob_y"));
   bad.forEach(el => el.closest(".fld")?.classList.add("bad"));
   if (!s.certify){ $("#certifyBox").classList.add("bad"); bad.push($("#certify")); }
+  if (attCount() && !$("#consent").checked){ $("#consentBox").classList.add("bad"); bad.push($("#consent")); }
   return bad;
 }
 function checkForm(){
@@ -416,20 +529,36 @@ $("#send").addEventListener("click", async () => {
   status("กำลังส่งใบสมัคร…");
   const s = read(), now = new Date();
   try {
+    if (ATT_TYPES.some(t => att[t.key].some(f => f.busy))){ status("รอให้ระบบย่อรูปเสร็จก่อน แล้วกดส่งอีกครั้ง", "bad"); btns.forEach(b => b.disabled = false); return; }
+    const files = attList();
     const ref = await db.collection("applications").add({
       data: s,
       photo: photoData || "",
       sig: sigData || "",
       appliedAt: now.toISOString(),
       submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      status: "new"
+      status: "new",
+      fileCount: files.length,
+      fileTypes: files.map(f => f.type)
     });
+    let failed = 0;
+    if (files.length){
+      $("#prog").hidden = false;
+      for (let i = 0; i < files.length; i++){
+        status(`ส่งใบสมัครแล้ว กำลังส่งรูปเอกสาร ${i+1}/${files.length}…`);
+        $("#prog i").style.width = (i / files.length * 100) + "%";
+        try { await ref.collection("files").doc("f" + i).set({type: files[i].type, label: files[i].label, data: files[i].data, w: files[i].w, h: files[i].h}); }
+        catch(e){ console.error(e); failed++; }
+      }
+      $("#prog i").style.width = "100%"; setTimeout(() => $("#prog").hidden = true, 800);
+    }
     const refNo = ref.id.slice(0, 8).toUpperCase();
     $("#refNo").textContent = refNo;
     $("#done").hidden = false;
     $("#send").textContent = "ส่งแล้ว";
     status("กำลังบันทึกไฟล์ PDF ลงเครื่อง…");
-    try { await savePdf(); status("บันทึกไฟล์ PDF ลงเครื่องแล้ว", "ok"); }
+    const fileNote = failed ? ` · ส่งรูปเอกสารไม่สำเร็จ ${failed} รูป กรุณานำเอกสารตัวจริงไปยื่นตามปกติ` : (files.length ? ` · ส่งรูปเอกสาร ${files.length} รูปแล้ว` : "");
+    try { await savePdf(); status("บันทึกไฟล์ PDF ลงเครื่องแล้ว" + fileNote, failed ? "bad" : "ok"); }
     catch(e){ status("ส่งใบสมัครแล้ว แต่บันทึก PDF ไม่สำเร็จ กดปุ่มบันทึกไฟล์อีกครั้งได้", "bad"); }
     $("#dl").disabled = false;
     try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
@@ -456,6 +585,7 @@ $("#resetYes").addEventListener("click", () => {
   ctx.clearRect(0,0,pad.width,pad.height); sigData = "";
   document.querySelectorAll(".bad").forEach(el => el.classList.remove("bad")); status("");
   $("#done").hidden = true; $("#send").textContent = "ส่งใบสมัคร"; $("#send").disabled = false;
+  ATT_TYPES.forEach(t => att[t.key] = []); $("#consent").checked = false; drawAttGrid();
   try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
   $("#resetAsk").hidden = true; $("#reset").hidden = false; render();
 });
