@@ -51,7 +51,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font
 .pw input{padding-right:64px}
 .pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:.8rem;background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 6px}
 .linkbtn{font:inherit;font-size:.86rem;background:none;border:0;color:var(--accent);cursor:pointer;text-decoration:underline;padding:2px}
-.note{font-size:.84rem;color:var(--muted);background:var(--soft);border-radius:8px;padding:10px 12px;text-align:left;width:100%}
+.tipbox{font-size:.84rem;color:var(--muted);background:var(--soft);border-radius:8px;padding:10px 12px;text-align:left;width:100%}
 .gate.wide{max-width:620px}
 .tbl{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
 .tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
@@ -100,6 +100,22 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
 .status{font-size:.88rem;min-height:1.3em}
 .status.ok{color:var(--ok)} .status.bad{color:var(--danger)}
 .paper{background:var(--soft);border-radius:10px;padding:12px}
+.files{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:14px}
+.files .fh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.files .fh h3{margin:0;font-size:1rem;flex:1}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.fcard{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);cursor:zoom-in;padding:0;font:inherit;color:inherit;text-align:left;display:flex;flex-direction:column}
+.fcard img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#fff}
+.fcard span{font-size:.8rem;padding:6px 8px;line-height:1.3}
+.fcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted);font-size:.88rem}
+.pill.att{background:var(--soft);color:var(--accent)}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(8,10,16,.88);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 12px)}
+.lb .bar{display:flex;gap:8px;align-items:center;color:#fff;flex-wrap:wrap}
+.lb .bar b{flex:1;font-weight:600;min-width:0}
+.lb .bar .btn{background:#ffffff1a;color:#fff;border-color:#ffffff40}
+.lb .stage{flex:1;display:grid;place-items:center;min-height:0;padding-top:10px}
+.lb .stage img{max-width:100%;max-height:100%;object-fit:contain;background:#fff;border-radius:4px}
 .scaler{position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.15);background:#fff;max-width:794px;margin:0 auto}
 .scaler > .sheet{transform-origin:0 0;position:absolute;left:0;top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -131,7 +147,7 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
   <section class="gate wide" id="setup" hidden>
     <h2>ตั้งค่าระบบครั้งแรก</h2>
     <p>นำเข้ารายชื่อผู้ดูแลจากไฟล์ Excel ที่มีคอลัมน์ คำนำหน้า, ชื่อ, สกุล, เบอร์โทร</p>
-    <div class="note">ทำได้ครั้งเดียวตอนเริ่มใช้ระบบ เลือก “ผู้ดูแลคนแรก” ในตาราง ระบบจะเข้าสู่ระบบด้วยคนนี้ หลังจากนี้ผู้ดูแลเพิ่มหรือลบคนอื่นได้จากเมนู “จัดการผู้ดูแล”</div>
+    <div class="tipbox">ทำได้ครั้งเดียวตอนเริ่มใช้ระบบ เลือก “ผู้ดูแลคนแรก” ในตาราง ระบบจะเข้าสู่ระบบด้วยคนนี้ หลังจากนี้ผู้ดูแลเพิ่มหรือลบคนอื่นได้จากเมนู “จัดการผู้ดูแล”</div>
     <label class="btn filebtn">เลือกไฟล์ Excel<input type="file" id="setupFile" accept=".xlsx,.xls,.csv"></label>
     <div class="tblwrap" id="setupPreview"></div>
     <button class="btn primary" id="setupGo" type="button" hidden>สร้างบัญชีผู้ดูแล</button>
@@ -148,7 +164,7 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
       <button class="btn primary" type="submit" id="pwSave">บันทึกรหัสผ่านใหม่</button>
     </form>
     <div class="status" id="pwMsg" role="status"></div>
-    <div class="note">ครั้งต่อไปให้เข้าระบบด้วยชื่อเดิมและรหัสผ่านใหม่ ถ้าลืมรหัสผ่าน ให้ผู้ดูแลคนอื่นลบสิทธิ์ แล้วเพิ่มใหม่โดยใช้ชื่อที่ต่างไปเล็กน้อย เช่น เติมตัวเลขท้ายชื่อ</div>
+    <div class="tipbox">ครั้งต่อไปให้เข้าระบบด้วยชื่อเดิมและรหัสผ่านใหม่ ถ้าลืมรหัสผ่าน ให้ผู้ดูแลคนอื่นลบสิทธิ์ แล้วเพิ่มใหม่โดยใช้ชื่อที่ต่างไปเล็กน้อย เช่น เติมตัวเลขท้ายชื่อ</div>
   </section>
 
   <section class="panel mgr" id="mgr" hidden>
@@ -164,7 +180,7 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
       <button class="btn primary" type="submit" id="addBtn">เพิ่มผู้ดูแล</button>
     </form>
     <div class="status" id="mgrMsg" role="status"></div>
-    <div class="note">ส่งต่องานให้คนใหม่: เพิ่มชื่อคนใหม่ก่อน ให้เขาลองเข้าระบบ แล้วให้คนใหม่เป็นผู้ลบชื่อคนเดิมออก (ลบชื่อตัวเองไม่ได้ เพื่อให้ระบบมีผู้ดูแลเหลืออย่างน้อย 1 คนเสมอ)</div>
+    <div class="tipbox">ส่งต่องานให้คนใหม่: เพิ่มชื่อคนใหม่ก่อน ให้เขาลองเข้าระบบ แล้วให้คนใหม่เป็นผู้ลบชื่อคนเดิมออก (ลบชื่อตัวเองไม่ได้ เพื่อให้ระบบมีผู้ดูแลเหลืออย่างน้อย 1 คนเสมอ)</div>
   </section>
 
   <main class="grid" id="app" hidden>
@@ -203,9 +219,26 @@ input[type=search]{font:inherit;width:100%;padding:8px 10px;border:1px solid var
         </div>
         <div class="status" id="status" role="status" style="margin-top:8px"></div>
         <div class="paper"><div class="scaler" id="scaler"></div></div>
+        <div class="files" id="files" hidden style="margin-top:14px">
+          <div class="fh"><h3 id="fTitle">เอกสารแนบ</h3>
+            <button class="btn small" id="fPdf" type="button">บันทึก PDF รวมเอกสารแนบ</button>
+            <button class="btn small danger" id="fDel" type="button">ลบเอกสารแนบ</button></div>
+          <div class="confirm" id="fDelAsk" hidden>ลบรูปเอกสารแนบทั้งหมดของใบสมัครนี้ใช่ไหม ใบสมัครยังอยู่ แต่กู้รูปคืนไม่ได้
+            <button class="btn small danger" id="fDelYes" type="button">ลบรูปทั้งหมด</button>
+            <button class="btn small" id="fDelNo" type="button">ยกเลิก</button></div>
+          <div class="fgrid" id="fGrid"></div>
+        </div>
       </div>
     </section>
   </main>
+</div>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lbTitle">
+  <div class="bar"><b id="lbTitle"></b>
+    <button class="btn small" id="lbPrev" type="button" aria-label="รูปก่อนหน้า">‹ ก่อนหน้า</button>
+    <button class="btn small" id="lbNext" type="button" aria-label="รูปถัดไป">ถัดไป ›</button>
+    <button class="btn small" id="lbSave" type="button">บันทึกรูป</button>
+    <button class="btn small" id="lbClose" type="button">ปิด</button></div>
+  <div class="stage"><img id="lbImg" alt=""></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -520,7 +553,7 @@ function listen(){
     renderList();
     if (current){
       const fresh = rows.find(r => r.id === current.id);
-      if (fresh) show(fresh, false); else closeDetail();
+      if (fresh){ const reload = !!fresh.filesDeleted !== !!current.filesDeleted; show(fresh, false); if (reload) loadFiles(fresh); } else closeDetail();
     }
   }, err => {
     $("#list").innerHTML = `<div class="empty">โหลดรายการไม่ได้: ${err.code === "permission-denied" ? "บัญชีนี้ไม่มีสิทธิ์อ่านข้อมูล (ตรวจ Rules ใน Firestore)" : err.code}</div>`;
@@ -561,7 +594,11 @@ function renderList(){
     const pill = document.createElement("span"); pill.className = "pill " + (checked ? "checked" : "new"); pill.textContent = checked ? "ตรวจแล้ว" : "ใหม่";
     const meta = document.createElement("span"); meta.className = "meta";
     [refNo(r.id), d.level || "-", d.phone || "-", fmtDate(whenOf(r))].forEach(t => { const x = document.createElement("span"); x.textContent = t; meta.appendChild(x); });
-    b.append(nm, pill, meta);
+    const pills = document.createElement("span"); pills.style.cssText = "display:flex;gap:6px;align-self:start";
+    const n = r.filesDeleted ? 0 : (r.fileCount || 0);
+    if (n){ const ap = document.createElement("span"); ap.className = "pill att"; ap.textContent = `แนบ ${n}`; pills.appendChild(ap); }
+    pills.appendChild(pill);
+    b.append(nm, pills, meta);
     b.addEventListener("click", () => { show(r, true); });
     list.appendChild(b);
   });
@@ -585,11 +622,98 @@ function show(r, scroll){
   $("#dPill").className = "pill " + (checked ? "checked" : "new"); $("#dPill").textContent = checked ? "ตรวจแล้ว" : "ใหม่";
   $("#toggle").textContent = checked ? "ย้อนเป็น “ใหม่”" : "ทำเครื่องหมายว่าตรวจแล้ว";
   NFE.fill(sheet, d, {photo: r.photo, sig: r.sig, date: r.appliedAt || whenOf(r) || new Date()});
-  if (changed){ status(""); $("#delAsk").hidden = true; }
+  if (changed){ status(""); $("#delAsk").hidden = true; loadFiles(r); }
   renderList();
   if (scroll && matchMedia("(max-width:960px)").matches) $("#detail").scrollIntoView({behavior:"smooth"});
 }
 function closeDetail(){ current = null; $("#dwrap").hidden = true; $("#pick").hidden = false; renderList(); }
+
+/* ---------- เอกสารแนบ ---------- */
+let files = [], filesFor = null, lbIdx = 0;
+async function loadFiles(r){
+  files = []; filesFor = r.id; $("#fDelAsk").hidden = true;
+  const box = $("#files"), grid = $("#fGrid");
+  const expected = r.filesDeleted ? 0 : (r.fileCount || 0);
+  if (!expected){
+    box.hidden = !r.filesDeleted;
+    grid.innerHTML = r.filesDeleted ? '<p class="muted">ลบรูปเอกสารแนบแล้ว</p>' : "";
+    $("#fTitle").textContent = "เอกสารแนบ"; $("#fPdf").hidden = $("#fDel").hidden = true;
+    return;
+  }
+  box.hidden = false; $("#fPdf").hidden = $("#fDel").hidden = false;
+  $("#fTitle").textContent = `เอกสารแนบ (${expected} รูป)`;
+  grid.innerHTML = '<p class="muted">กำลังโหลดรูปเอกสาร…</p>';
+  try {
+    const snap = await col.doc(r.id).collection("files").get();
+    if (filesFor !== r.id) return;
+    files = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => +a.id.slice(1) - +b.id.slice(1));
+    grid.textContent = "";
+    if (!files.length){ grid.innerHTML = '<p class="muted">ไม่พบรูปเอกสาร (อาจส่งไม่สำเร็จ)</p>'; $("#fPdf").hidden = true; return; }
+    if (files.length < expected){ const p = document.createElement("p"); p.className = "muted"; p.style.gridColumn = "1/-1"; p.textContent = `ได้รับ ${files.length} จาก ${expected} รูป บางรูปอาจส่งไม่สำเร็จ`; grid.appendChild(p); }
+    files.forEach((f, i) => {
+      const c = document.createElement("button"); c.type = "button"; c.className = "fcard";
+      const img = document.createElement("img"); img.src = safeJpeg(f.data); img.alt = f.label || "";
+      const t = document.createElement("span"); t.textContent = f.label || `รูปที่ ${i+1}`;
+      c.append(img, t); c.onclick = () => openLb(i); grid.appendChild(c);
+    });
+  } catch(e){ grid.innerHTML = '<p class="muted">โหลดรูปเอกสารไม่ได้</p>'; }
+}
+const safeJpeg = src => /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(src || "") ? src : "";
+function openLb(i){ lbIdx = i; $("#lb").hidden = false; drawLb(); $("#lbClose").focus(); }
+function drawLb(){
+  const f = files[lbIdx]; if (!f) return;
+  $("#lbImg").src = safeJpeg(f.data); $("#lbImg").alt = f.label || "";
+  $("#lbTitle").textContent = `${f.label || ""} · ${lbIdx+1}/${files.length}`;
+  $("#lbPrev").disabled = lbIdx === 0; $("#lbNext").disabled = lbIdx === files.length - 1;
+}
+$("#lbPrev").onclick = () => { if (lbIdx > 0){ lbIdx--; drawLb(); } };
+$("#lbNext").onclick = () => { if (lbIdx < files.length - 1){ lbIdx++; drawLb(); } };
+$("#lbClose").onclick = () => { $("#lb").hidden = true; };
+$("#lb").addEventListener("click", e => { if (e.target.id === "lb" || e.target.classList.contains("stage")) $("#lb").hidden = true; });
+document.addEventListener("keydown", e => {
+  if ($("#lb").hidden) return;
+  if (e.key === "Escape") $("#lb").hidden = true;
+  if (e.key === "ArrowLeft") $("#lbPrev").click();
+  if (e.key === "ArrowRight") $("#lbNext").click();
+});
+$("#lbSave").onclick = async () => {
+  const f = files[lbIdx]; if (!f || !current) return;
+  const blob = await (await fetch(safeJpeg(f.data))).blob();
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `${refNo(current.id)}_${(f.label || "เอกสาร").replace(/\s+/g, "_")}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+};
+async function pdfWithFiles(){
+  const pdf = await NFE.toPdf(sheet);
+  for (const f of files){
+    const w = f.w || 1000, h = f.h || 1400, land = w > h;
+    pdf.addPage("a4", land ? "landscape" : "portrait");
+    const pw = land ? 297 : 210, ph = land ? 210 : 297, m = 10, top = 16;
+    pdf.setFontSize(10); pdf.text(`${refNo(current.id)}  ${files.indexOf(f) + 1}/${files.length}`, m, 10);
+    const k = Math.min((pw - 2*m) / w, (ph - top - m) / h);
+    pdf.addImage(safeJpeg(f.data), "JPEG", (pw - w*k) / 2, top, w*k, h*k);
+  }
+  return pdf;
+}
+$("#fPdf").addEventListener("click", async () => {
+  if (!current || !files.length) return;
+  const btn = $("#fPdf"); btn.disabled = true; status("กำลังสร้างไฟล์ PDF รวมเอกสารแนบ…");
+  try { const pdf = await pdfWithFiles(); pdf.save(refNo(current.id) + "_รวมเอกสาร_" + NFE.fileName(current.data || {})); status("บันทึกไฟล์ PDF รวมเอกสารแนบแล้ว", "ok"); }
+  catch(e){ console.error(e); status("สร้างไฟล์ไม่สำเร็จ กรุณาลองใหม่", "bad"); }
+  finally { btn.disabled = false; }
+});
+$("#fDel").addEventListener("click", () => { $("#fDelAsk").hidden = false; });
+$("#fDelNo").addEventListener("click", () => { $("#fDelAsk").hidden = true; });
+$("#fDelYes").addEventListener("click", async () => {
+  if (!current) return;
+  const id = current.id;
+  try {
+    const snap = await col.doc(id).collection("files").get();
+    for (const d of snap.docs) await col.doc(id).collection("files").doc(d.id).delete();
+    await col.doc(id).update({filesDeleted: true});
+    status("ลบรูปเอกสารแนบแล้ว", "ok");
+  } catch(e){ status("ลบรูปไม่สำเร็จ: " + (e.code || e.message), "bad"); }
+});
 
 $("#print").addEventListener("click", async () => {
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
@@ -615,13 +739,17 @@ $("#del").addEventListener("click", () => { $("#delAsk").hidden = false; });
 $("#delNo").addEventListener("click", () => { $("#delAsk").hidden = true; });
 $("#delYes").addEventListener("click", async () => {
   if (!current) return;
-  try { await col.doc(current.id).delete(); $("#delAsk").hidden = true; closeDetail(); }
+  try {
+    const id = current.id;
+    try { const snap = await col.doc(id).collection("files").get(); for (const d of snap.docs) await col.doc(id).collection("files").doc(d.id).delete(); } catch(_){}
+    await col.doc(id).delete(); $("#delAsk").hidden = true; closeDetail();
+  }
   catch(e){ status("ลบไม่สำเร็จ: " + e.code, "bad"); }
 });
 
 /* ---------- Excel ---------- */
 $("#csv").addEventListener("click", () => {
-  const head = ["ลำดับ","เลขที่","วันที่ส่ง","สถานะ","ระดับ","ชื่อ","นามสกุล","เลขบัตรประชาชน/รหัส G","วันเดือนปีเกิด","อายุ (ปี)","ศาสนา","สัญชาติ","อาชีพ","โทรศัพท์","บ้านเลขที่","หมู่","ซอย","ถนน","ตำบล","อำเภอ","จังหวัด","รหัสไปรษณีย์","ชื่อ-สกุลบิดา","ชื่อ-สกุลมารดา","จบชั้น","ปีที่จบ","จากสถานศึกษา","วุฒิทางธรรม","ศกร./ศรช./ศศช.","รหัสกลุ่ม"];
+  const head = ["ลำดับ","เลขที่","วันที่ส่ง","สถานะ","ระดับ","ชื่อ","นามสกุล","เลขบัตรประชาชน/รหัส G","วันเดือนปีเกิด","อายุ (ปี)","ศาสนา","สัญชาติ","อาชีพ","โทรศัพท์","บ้านเลขที่","หมู่","ซอย","ถนน","ตำบล","อำเภอ","จังหวัด","รหัสไปรษณีย์","ชื่อ-สกุลบิดา","ชื่อ-สกุลมารดา","จบชั้น","ปีที่จบ","จากสถานศึกษา","วุฒิทางธรรม","ศกร./ศรช./ศศช.","รหัสกลุ่ม","เอกสารแนบ (รูป)"];
   const rowsOut = visible().map((r, i) => {
     const d = r.data || {}, t = whenOf(r);
     const age = NFE.ageOf(d, new Date(r.appliedAt || t || Date.now()));
@@ -630,7 +758,7 @@ $("#csv").addEventListener("click", () => {
       r.status === "checked" ? "ตรวจแล้ว" : "ใหม่", d.level, d.fname, d.lname, NFE.fmtCid(d.cid),
       d.dob_d ? `${d.dob_d} ${d.dob_m ? NFE.MONTHS[d.dob_m-1] : ""} ${d.dob_y||""}` : "", age ? age.years : "",
       d.religion, d.nation, d.job, d.phone, d.h_no, d.h_moo, d.h_soi, d.h_road, d.h_tambon, d.h_amphoe, d.h_prov, d.h_zip,
-      d.father, d.mother, d.prev_grade, d.prev_year, d.prev_school, d.dharma, d.center, d.group
+      d.father, d.mother, d.prev_grade, d.prev_year, d.prev_school, d.dharma, d.center, d.group, r.filesDeleted ? "ลบแล้ว" : (r.fileCount || 0)
     ].map(v => v ?? "");
   });
   const ws = XLSX.utils.aoa_to_sheet([head, ...rowsOut]);
